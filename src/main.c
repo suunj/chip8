@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include "SDL2/SDL.h"
 #include "chip8.h"
+#include "chip8keyboard.h"
+
+const char keyboard_map[CHIP8_TOTAL_KEYS] = {
+   SDLK_0, SDLK_1, SDLK_2, SDLK_3, SDLK_4, SDLK_5,
+   SDLK_6, SDLK_7, SDLK_8, SDLK_9, SDLK_a, SDLK_b,
+   SDLK_c, SDLK_d, SDLK_e, SDLK_f
+};
 
 int main() {
    struct chip8 chip8;
-   chip8.registers.SP = 0;
-   chip8_stack_push(&chip8, 0xff);
-   chip8_stack_push(&chip8, 0xaa);
-
-   printf("%x\n", chip8_stack_pop(&chip8));
-   printf("%x\n", chip8_stack_pop(&chip8));
 
    // SDL 라이브러리 초기화 (비디오, 오디오, 이벤트 등 모든 서브시스템)
    SDL_Init(SDL_INIT_EVERYTHING);
@@ -34,9 +35,26 @@ int main() {
 
       // 이벤트 폴링: 키보드, 마우스, 윈도우 이벤트 처리
       while (SDL_PollEvent(&e)) {
-         // 윈도우 닫기 버튼 클릭 시 종료
-         if (e.type == SDL_QUIT) {
-            goto out;
+         switch (e.type) {
+            case SDL_QUIT:
+               goto out;
+               break;
+            case SDL_KEYDOWN: {
+               char key = e.key.keysym.sym;
+               int vkey = chip8_keyboard_map(keyboard_map, key);
+               if (vkey != -1) {
+                  chip8_keyboard_down(&chip8.keyboard, vkey);
+               }
+               break;
+            }
+            case SDL_KEYUP: {
+               char key = e.key.keysym.sym;
+               int vkey = chip8_keyboard_map(keyboard_map, key);
+               if (vkey != -1) {
+                  chip8_keyboard_up(&chip8.keyboard, vkey);
+               }
+               break;
+            }
          }
       }
 
