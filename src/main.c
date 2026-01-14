@@ -11,6 +11,7 @@ const char keyboard_map[CHIP8_TOTAL_KEYS] = {
 
 int main() {
    struct chip8 chip8;
+   chip8_init(&chip8);
 
    // SDL 라이브러리 초기화 (비디오, 오디오, 이벤트 등 모든 서브시스템)
    SDL_Init(SDL_INIT_EVERYTHING);
